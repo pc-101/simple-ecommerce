@@ -1,15 +1,23 @@
 'use client';
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 import { useCart } from '@/store/cart';
 import Image from 'next/image';
 
 export default function CartDrawer({ open, onClose }: { open: boolean; onClose: () => void }){
   const { items, inc, dec, remove, total, clear } = useCart();
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50 grid grid-cols-[1fr,360px] bg-black/40" onClick={onClose}>
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => setMounted(true), []);
+  if (!mounted || !open) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-50 grid grid-cols-[minmax(0,1fr),minmax(320px,90vw)] bg-black/40 md:grid-cols-[1fr,360px]" onClick={onClose}>
       <div />
-      <div className="h-full overflow-auto bg-white p-4 dark:bg-slate-900" onClick={(e)=>e.stopPropagation()}>
+      <div
+        className="h-full overflow-auto bg-white p-4 shadow-xl dark:bg-slate-900"
+        onClick={(e)=>e.stopPropagation()}
+      >
         <div className="mb-3 flex items-center justify-between">
           <div className="text-lg font-semibold">Your Cart</div>
           <button className="btn" onClick={onClose}>Close</button>
@@ -40,6 +48,7 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
