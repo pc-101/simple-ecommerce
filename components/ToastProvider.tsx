@@ -30,7 +30,7 @@ function makeId() {
 }
 
 export function ToastProvider({ children }: { children: ReactNode }) {
-  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [toast, setToast] = useState<Toast | null>(null);
   const toastBaseClasses =
     'rounded-lg border px-3 py-2 text-sm shadow-lg backdrop-blur animate-[toast-in_220ms_cubic-bezier(.22,1,.36,1)]';
   const toastVariantClasses: Record<ToastVariant, string> = {
@@ -41,19 +41,17 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   };
 
   const remove = useCallback((id: string) => {
-    setToasts((prev) =>
-      prev.map((toast) => (toast.id === id ? { ...toast, closing: true } : toast))
-    );
+    setToast((prev) => (prev && prev.id === id ? { ...prev, closing: true } : prev));
     window.setTimeout(() => {
-      setToasts((prev) => prev.filter((toast) => toast.id !== id));
+      setToast((prev) => (prev && prev.id === id ? null : prev));
     }, 180);
   }, []);
 
   const notify = useCallback(
     ({ message, variant = 'success', durationMs = 2400 }: ToastInput) => {
       const id = makeId();
-      // Cap the queue and auto-expire each toast after a short delay.
-      setToasts((prev) => [...prev, { id, message, variant }].slice(-3));
+      // Replace any existing toast and auto-expire after a short delay.
+      setToast({ id, message, variant });
       window.setTimeout(() => remove(id), durationMs);
     },
     [remove]
@@ -71,12 +69,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div
-        className="fixed right-4 top-16 z-[60] flex w-[min(90vw,360px)] flex-col gap-2"
-        role="status"
-        aria-live="polite"
-      >
-        {toasts.map((toast) => (
+      <div className="fixed right-4 top-16 z-[60] w-[min(90vw,360px)]">
+        <div role="status" aria-live="polite">
+          {toast && (
           <div
             key={toast.id}
             className={`${toastBaseClasses} ${
@@ -87,7 +82,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           >
             {toast.message}
           </div>
-        ))}
+          )}
+        </div>
       </div>
     </ToastContext.Provider>
   );
