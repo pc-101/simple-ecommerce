@@ -7,3 +7,9 @@ body { @apply bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100; }
 .btn { @apply inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm hover:bg-black/5 dark:hover:bg-white/5; }
 .input { @apply w-full rounded-md border bg-transparent px-3 py-2 text-sm outline-none dark:border-slate-700; }
 .card { @apply rounded-xl border bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900; }
+
+@keyframes toast-in {
+  0% { transform: translateY(10px) scale(0.98); opacity: 0; }
+  60% { transform: translateY(-2px) scale(1.01); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
