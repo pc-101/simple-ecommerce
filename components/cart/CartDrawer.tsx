@@ -1,15 +1,30 @@
 'use client';
 import * as React from 'react';
 import { createPortal } from 'react-dom';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useCart } from '@/store/cart';
+import { useToast } from '@/components/ToastProvider';
 import Image from 'next/image';
 
 export default function CartDrawer({ open, onClose }: { open: boolean; onClose: () => void }){
+  const router = useRouter();
+  const { data: session } = useSession();
   const { items, inc, dec, remove, total, clear } = useCart();
+  const { error } = useToast();
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => setMounted(true), []);
   if (!mounted || !open) return null;
+
+  const handleCheckout = () => {
+    if (!session) {
+      error('Please sign in to proceed to checkout.');
+      return;
+    }
+    onClose();
+    router.push('/checkout');
+  };
 
   return createPortal(
     <div className="fixed inset-0 z-50 grid grid-cols-[minmax(0,1fr),minmax(320px,90vw)] bg-black/40 md:grid-cols-[1fr,360px]" onClick={onClose}>
@@ -43,7 +58,7 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
               <div className="font-medium">Total</div>
               <div className="font-semibold">${total().toFixed(2)}</div>
             </div>
-            <button className="btn w-full">Proceed to Checkout</button>
+            <button className="btn w-full" onClick={handleCheckout}>Proceed to Checkout</button>
             <button className="btn w-full" onClick={clear}>Clear Cart</button>
           </div>
         )}
