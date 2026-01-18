@@ -70,7 +70,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={value}>
       {children}
       <div className="fixed right-4 top-16 z-[60] w-[min(90vw,360px)]">
-        <div role="status" aria-live="polite">
+        <div
+          role="status"
+          aria-live={toast?.variant === 'error' ? 'assertive' : 'polite'}
+        >
           {toast && (
           <div
             key={toast.id}
