@@ -10,7 +10,7 @@ import {
 } from 'react';
 
 type ToastVariant = 'success' | 'error';
-type Toast = { id: string; message: string; variant: ToastVariant };
+type Toast = { id: string; message: string; variant: ToastVariant; closing?: boolean };
 type ToastInput = { message: string; variant?: ToastVariant; durationMs?: number };
 type ToastContextValue = {
   notify: (input: ToastInput) => void;
@@ -41,7 +41,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   };
 
   const remove = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    setToasts((prev) =>
+      prev.map((toast) => (toast.id === id ? { ...toast, closing: true } : toast))
+    );
+    window.setTimeout(() => {
+      setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    }, 180);
   }, []);
 
   const notify = useCallback(
@@ -74,7 +79,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`${toastBaseClasses} ${toastVariantClasses[toast.variant]}`}
+            className={`${toastBaseClasses} ${
+              toast.closing
+                ? 'animate-[toast-out_180ms_ease-in_forwards]'
+                : 'animate-[toast-in_220ms_cubic-bezier(.22,1,.36,1)]'
+            } ${toastVariantClasses[toast.variant]}`}
           >
             {toast.message}
           </div>
