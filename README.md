@@ -8,6 +8,7 @@ A Next.js 16 project that showcases a headless-friendly storefront: faceted cata
 - **Persisted cart** – Client cart state lives in a small Zustand store persisted to `localStorage`, exposed through a dynamically imported drawer to keep the main bundle lean.
 - **Authentication gate** – NextAuth Credentials provider with a demo account protects the checkout route and drives the nav sign-in/sign-out controls.
 - **Optimized UI** – Tailwind CSS design system, `next/image` remote patterns, and a sticky navbar to keep navigation and the cart accessible on all viewports.
+- **Toast feedback** – Live-region toasts announce add-to-cart success and auth-required checkout errors with accessible messaging.
 - **Type-safe data** – Shared `Product` types feed the API route, cart store, and UI components to avoid duplicated shape definitions.
 - **Production-ready defaults** – ESLint, TypeScript, and environment-driven URLs so server and browser fetches work both locally and when deployed.
 
@@ -56,6 +57,7 @@ components/
   NavBar.tsx          # Sticky header with auth + cart controls
   Filters.tsx         # Client component that syncs filters to the URL
   ProductCard.tsx     # Catalog card with price + rating display
+  ToastProvider.tsx   # Live-region toast system for UI feedback
   cart/CartDrawer.tsx # Dynamically imported cart drawer UI
 store/
   cart.ts             # Zustand store with persistence helpers
@@ -79,6 +81,7 @@ lib/
 
 - **Catalog data flow** – The `/catalog` route converts the URL query into a server-side fetch against `/api/products`, ensuring filters are easily shareable while keeping the catalog fully static-cache friendly.
 - **Cart + checkout** – The cart drawer uses a persisted Zustand slice to retain items between sessions. Checkout reads directly from this store but blocks rendering until `useSession` confirms the user is authenticated.
+- **User feedback** – Add-to-cart actions surface a short toast with the product name, and checkout prompts unauthenticated users with an error toast.
 - **Auth UX** – `NavBar` uses `next-auth/react` to show sign-in/out buttons, and the sign-in page is prefilled with the demo credentials so QA teams can get in immediately.
 - **Styling** – Tailwind utility classes (see `app/globals.css` and `tailwind.config.ts`) provide consistent “btn”, “card”, and “input” primitives for rapid skinning.
 
