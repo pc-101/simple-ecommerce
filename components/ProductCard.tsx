@@ -21,7 +21,7 @@ export default function ProductCard({ p }: { p: Product }){
     }, 500);
     try {
       add(p);
-      success('Added to cart');
+      success(`Added "${p.title}" to cart`);
     } catch {
       error('Could not add to cart');
     }
